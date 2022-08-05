@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require '../functions.php';
 $datakursus = query("SELECT * FROM tb_kursus");
 ?>
@@ -57,7 +59,36 @@ $datakursus = query("SELECT * FROM tb_kursus");
                 <p>
                 Silakan pilih kursus
                 </p>
+
+                <?php
+                // cek tombol submit
+                if( isset($_POST["submit"]) ) {
+                    // cek insert
+                    if( tambahpendaftaran($_POST) > 0 ) { 
+                        echo "
+                            <script>
+                                alert('data berhasil ditambahkan!');
+                                document.location.href='success.php';
+                            </script>
+                        ";
+                    } else {
+                    echo mysqli_error($conn);
+                    echo "<br>";
+                    echo var_dump(mysqli_affected_rows($conn));
+
+                        // echo "
+                        // <script>
+                        //     alert('data gagal ditambahkan!');
+                        //     document.location.href='kelola_wisata.php';
+                        // </script>
+                        // ";
+                    }
+                }
+
+                ?>
+
                 <form action="" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="id_mahasiswa" value="<?= $_SESSION["id_mahasiswa"]; ?>">
                 <!-- <div class="form-group row justify-content-start">
                     <label for="nama_mahasiswa" class="col-sm-3 col-form-label">Nama Mahasiswa</label> 
                     <div class="col-sm-8">
@@ -66,21 +97,20 @@ $datakursus = query("SELECT * FROM tb_kursus");
                 </div> -->
 
                 <div class="form-group row justify-content-start">
-                    <label for="kursus" class="col-sm-3 col-form-label">Kursus</label>
+                    <label for="id_kursus" class="col-sm-3 col-form-label">Kursus</label>
                     <div class="col-sm-8">
-                        <select class="form-control" name="kursus" id="kursus">
+                        <select class="form-control" name="id_kursus" id="id_kursus">
                         <?php foreach( $datakursus as $row ) : ?>
                         <option value="<?= $row["id_kursus"]; ?><"><?= $row["nama_kursus"]; ?></option>
                         <?php endforeach; ?>
                         </select>
                     </div>
-                </div>                
+                </div>              
                
-
                 <div class="form-group row justify-content-start">
-                    <label for="krs" class="col-sm-3 col-form-label">Upload KRS</label>
+                    <label for="pdf" class="col-sm-3 col-form-label">Upload KRS</label>
                     <div class="col-sm-8">
-                        <input type="file" class="form-control-file" name="krs" id="krs" required autocomplete="off">
+                        <input type="file" class="form-control-file" name="pdf" id="pdf" required autocomplete="off">
                     </div>
                 </div>
 

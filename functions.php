@@ -94,6 +94,72 @@ function upload() {
     return $namaFileBaru;
 }
 
+function tambahpendaftaran($data) {
+    global $conn;
+    // ambil data
+    $id_mahasiswa = $data["id_mahasiswa"];
+    $id_kursus = $data["id_kursus"];
+
+    // upload pdf
+    $pdf = uploadpdf();
+    if( !$pdf ) {
+        return false;
+    } 
+
+     // query insert data
+     $query = "INSERT INTO tb_pendaftaran_kursus
+                VALUES
+            (0, '$id_mahasiswa', '$id_kursus', '$pdf', 0)
+            ";
+     
+     mysqli_query($conn, $query);
+
+     return mysqli_affected_rows($conn);
+}
+
+function uploadpdf() {
+    $namaFile = $_FILES['pdf']['name'];
+    $ukuranFile = $_FILES['pdf']['size'];
+    $error = $_FILES['pdf']['error'];
+    $tmpName = $_FILES['pdf']['tmp_name'];
+
+    // cek apakah tidak ada pdf yang diupload
+    if ( $error === 4 ) {
+            echo "<script> 
+                    alert('Pilih pdf terlebih dahulu!');
+                  </script>";
+            return false;
+    }
+
+    // cek apakah yang diupload adalah pdf
+    $ekstensiPdfValid = ['pdf'];
+    $ekstensiPdf = explode('.', $namaFile);
+    $ekstensiPdf = strtolower(end($ekstensiPdf));
+    if( !in_array($ekstensiPdf, $ekstensiPdfValid) ) {
+        echo "<script> 
+                    alert('Yang anda upload bukan Pdf!');
+                  </script>";
+            return false;
+    }
+
+    // cek jika ukurannya terlalu besar
+    if( $ukuranFile > 2000000 ) {
+        echo "<script> 
+                    alert('Ukuran pdf terlalu besar!');
+                  </script>";
+            return false;
+    }
+
+    // lolos pengecekan, pdf siap diupload
+    // generate nama pdf baru
+    $namaFileBaru = uniqid();
+    $namaFileBaru .= '.';
+    $namaFileBaru .= $ekstensiPdf;
+    move_uploaded_file($tmpName, './assets/pdf/' . $namaFileBaru);
+
+    return $namaFileBaru;
+}
+
 
 function hapus($id) {
     global $conn;
